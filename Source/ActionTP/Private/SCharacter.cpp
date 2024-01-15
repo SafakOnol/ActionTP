@@ -3,6 +3,7 @@
 
 #include "SCharacter.h"
 
+#include "Components/InputComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
@@ -26,7 +27,7 @@ void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Add Input Mapping Context - Safak Onol
+	// Add Input Mapping Context
 	if(APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
 		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -37,12 +38,14 @@ void ASCharacter::BeginPlay()
 	
 }
 
+// Function to bind to IA_Move
 void ASCharacter::Move(const FInputActionValue& Value)
 {
-	const bool CurrentValue = Value.Get<bool>();
-	if (CurrentValue)
+	const float DirectionValue = Value.Get<float>();
+
+	if (GetController() && DirectionValue)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("IA_Move triggered!"));
+		AddMovementInput(GetActorForwardVector(), DirectionValue);
 	}
 }
 

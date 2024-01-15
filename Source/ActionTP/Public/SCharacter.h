@@ -39,6 +39,7 @@ protected:
 	UInputAction* MoveAction;
 	
 	void Move(const FInputActionValue& Value);
+	
 
 public:	
 	// Called every frame
