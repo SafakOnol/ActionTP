@@ -3,8 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputActionValue.h"
 #include "GameFramework/Character.h"
 #include "SCharacter.generated.h"
+
+class UInputAction;
+class UInputMappingContext;
+class UCameraComponent;
+class USpringArmComponent;
 
 UCLASS()
 class ACTIONTP_API ASCharacter : public ACharacter
@@ -18,6 +24,21 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	// Safak Onol //
+	UPROPERTY(VisibleAnywhere)
+	USpringArmComponent* SpringArmComp;
+
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* CameraComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputMappingContext* DefaultInputMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputAction* MoveAction;
+	
+	void Move(const FInputActionValue& Value);
 
 public:	
 	// Called every frame
