@@ -74,6 +74,10 @@ Plugins/*/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 
+Content/ExampleContent/*
+Content/ParagonGideon/*
+Content/ParagonMinions/*
+
 # Common IntelliJ Platform excludes
 
 # User specific

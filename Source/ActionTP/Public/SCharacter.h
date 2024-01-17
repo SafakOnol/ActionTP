@@ -37,9 +37,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputAction* MoveAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputAction* TurnAction;
 	
 	void Move(const FInputActionValue& Value);
-	
+	void Turn(const FInputActionValue& Value);
 
 public:	
 	// Called every frame

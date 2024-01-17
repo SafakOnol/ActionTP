@@ -41,11 +41,34 @@ void ASCharacter::BeginPlay()
 // Function to bind to IA_Move
 void ASCharacter::Move(const FInputActionValue& Value)
 {
-	const float DirectionValue = Value.Get<float>();
+	const FVector2D MoveVector = Value.Get<FVector2D>();
 
-	if (GetController() && DirectionValue)
+	const FVector Forward = GetActorForwardVector();
+	AddMovementInput(Forward, MoveVector.Y);
+
+	const FVector Right = GetActorRightVector();
+	AddMovementInput(Right, MoveVector.X);
+
+	// Rotation
+	/*const FRotator Rotation = Controller->GetControlRotation();
+	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	AddMovementInput(ForwardDirection, MoveVector.Y);
+	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	AddMovementInput(RightDirection, MoveVector.X);*/
+}
+
+void ASCharacter::Turn(const FInputActionValue& Value)
+{
+	const FVector2D LookAxisValue = Value.Get<FVector2D>();
+	if (GetController() && LookAxisValue.X)
 	{
-		AddMovementInput(GetActorForwardVector(), DirectionValue);
+		AddControllerYawInput(LookAxisValue.X);
+	}
+	else if (GetController() && LookAxisValue.Y)
+	{
+		AddControllerPitchInput(LookAxisValue.Y);
 	}
 }
 
@@ -64,6 +87,7 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	if(UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASCharacter::Move);
+		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &ASCharacter::Turn);
 	}
 }
 
