@@ -47,10 +47,14 @@ protected:
 	UInputAction* TurnAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* JumpAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* PrimaryAttackAction;
 	
 	void Move(const FInputActionValue& Value);
 	void Turn(const FInputActionValue& Value);
+	void Jump(const FInputActionValue& Value);
 	void PrimaryAttack();
 
 public:	

@@ -75,11 +75,18 @@ void ASCharacter::Turn(const FInputActionValue& Value)
 	}
 }
 
+void ASCharacter::Jump(const FInputActionValue& Value)
+{
+	ACharacter::Jump();
+}
+
 void ASCharacter::PrimaryAttack()
 {
 	// Spawn Projectile
-
-	FTransform SpawnTM = FTransform(GetControlRotation(), GetActorLocation());
+	
+	FVector HandSocketLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	
+	FTransform SpawnTM = FTransform(GetControlRotation(), HandSocketLocation);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -118,6 +125,7 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	{
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASCharacter::Move);
 		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &ASCharacter::Turn);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASCharacter::Jump);
 		EnhancedInputComponent->BindAction(PrimaryAttackAction, ETriggerEvent::Triggered, this, &ASCharacter::PrimaryAttack);
 	}
 }
