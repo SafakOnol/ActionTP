@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "SCharacter.generated.h"
 
+class USInteractionComponent;
 class UInputAction;
 class UInputMappingContext;
 class UCameraComponent;
@@ -37,6 +38,10 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp;
 
+	UPROPERTY(VisibleAnywhere)
+	USInteractionComponent* InteractionComponent;
+
+	// ENHANCED INPUT SETTINGS
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputMappingContext* DefaultInputMappingContext;
 
@@ -51,11 +56,16 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* PrimaryAttackAction;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* PrimaryInteraction;
+
+	// INPUT FUNCTION
 	void Move(const FInputActionValue& Value);
 	void Turn(const FInputActionValue& Value);
 	void Jump(const FInputActionValue& Value);
 	void PrimaryAttack();
+	void PrimaryInteract();
 
 public:	
 	// Called every frame
