@@ -12,6 +12,8 @@ class UInputAction;
 class UInputMappingContext;
 class UCameraComponent;
 class USpringArmComponent;
+class UAnimMontage;
+struct FTimerHandle;
 
 UCLASS()
 class ACTIONTP_API ASCharacter : public ACharacter
@@ -20,9 +22,17 @@ class ACTIONTP_API ASCharacter : public ACharacter
 
 protected:
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
 
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UAnimMontage* AttackAnim;
+
+	FTimerHandle TimerHandle_PrimaryAttack;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float AttackDelay = 0.2f;
+	
 public:
 	// Sets default values for this character's properties
 	ASCharacter();
@@ -59,12 +69,14 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* PrimaryInteraction;
+	
 
 	// INPUT FUNCTION
 	void Move(const FInputActionValue& Value);
 	void Turn(const FInputActionValue& Value);
 	void Jump(const FInputActionValue& Value);
 	void PrimaryAttack();
+	void PrimaryAttack_TimeElapsed();
 	void PrimaryInteract();
 
 public:	

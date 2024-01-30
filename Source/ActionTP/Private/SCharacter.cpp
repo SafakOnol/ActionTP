@@ -23,7 +23,7 @@ ASCharacter::ASCharacter()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
-
+	
 	InteractionComponent = CreateDefaultSubobject<USInteractionComponent>("InteractionComponent");
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -35,7 +35,7 @@ ASCharacter::ASCharacter()
 void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	// Add Input Mapping Context
 	if(APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
@@ -85,12 +85,17 @@ void ASCharacter::Jump(const FInputActionValue& Value)
 
 void ASCharacter::PrimaryAttack()
 {
-	// Spawn Projectile
+	// Animation
+	PlayAnimMontage(AttackAnim);
 	
-	FVector HandSocketLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	
-	FTransform SpawnTM = FTransform(GetControlRotation(), HandSocketLocation);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, AttackDelay);
+}
 
+void ASCharacter::PrimaryAttack_TimeElapsed()
+{
+	// Spawn Projectile
+	FVector HandSocketLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	FTransform SpawnTM = FTransform(GetControlRotation(), HandSocketLocation);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	

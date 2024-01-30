@@ -38,6 +38,5 @@ void ASItemChest::Interact_Implementation(APawn* InstigatorPawn)
 void ASItemChest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
