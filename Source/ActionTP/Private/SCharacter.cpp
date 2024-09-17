@@ -6,10 +6,12 @@
 #include "Components/InputComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "SAttributeComponent.h"
 #include "SInteractionComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "SAttributeComponent.h"
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -26,6 +28,8 @@ ASCharacter::ASCharacter()
 	
 	InteractionComponent = CreateDefaultSubobject<USInteractionComponent>("InteractionComponent");
 
+	AttributeComponent = CreateDefaultSubobject<USAttributeComponent>("AttributeComponent");
+	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
@@ -93,18 +97,22 @@ void ASCharacter::PrimaryAttack()
 
 void ASCharacter::PrimaryAttack_TimeElapsed()
 {
+	
 	// Spawn Projectile
 	FVector HandSocketLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	
+	
 	FTransform SpawnTM = FTransform(GetControlRotation(), HandSocketLocation);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Instigator = this;
 	
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 }
 
 void ASCharacter::PrimaryInteract()
 {
-	if(InteractionComponent)
+	if(ensure(InteractionComponent))
 	{
 		InteractionComponent->PrimaryInteract();	
 	}
@@ -131,6 +139,10 @@ void ASCharacter::Tick(float DeltaTime)
 	FVector ControllerDirection_LineEnd = LineStart + (GetControlRotation().Vector() * 100.0f);
 	// Draw 'Controller' Rotation ('PlayerController' that 'possessed' this character)
 	DrawDebugDirectionalArrow(GetWorld(), LineStart, ControllerDirection_LineEnd, DrawScale, FColor::Green, false, 0.0f, 0, Thickness);
+
+	// -- Crosshair location -- //
+	
+	
 }
 
 // Called to bind functionality to input

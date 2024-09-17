@@ -3,6 +3,7 @@
 
 #include "SMagicProjectile.h"
 
+#include "SAttributeComponent.h"
 #include "SExplosiveBarrel.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -14,20 +15,18 @@ ASMagicProjectile::ASMagicProjectile()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
-	/*SphereComponent->SetCollisionObjectType(ECC_WorldDynamic);
-	SphereComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
-	SphereComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);*/
-	SphereComponent->SetCollisionProfileName("Projectile");
-	RootComponent = SphereComponent;
+	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
+	SphereComp->SetCollisionProfileName("Projectile");
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ASMagicProjectile::OnActorOverlap);
+	RootComponent = SphereComp;
 
-	ParticleEffectComponent = CreateDefaultSubobject<UParticleSystemComponent>("ParticleEffectComponent");
-	ParticleEffectComponent->SetupAttachment(SphereComponent);
+	ParticleEffectComp = CreateDefaultSubobject<UParticleSystemComponent>("ParticleEffectComponent");
+	ParticleEffectComp->SetupAttachment(SphereComp);
 
-	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComponent");
-	ProjectileMovementComponent->InitialSpeed = 1000.f;
-	ProjectileMovementComponent->bRotationFollowsVelocity = true;
-	ProjectileMovementComponent->bInitialVelocityInLocalSpace = true;
+	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComponent");
+	ProjectileMovementComp->InitialSpeed = 1000.f;
+	ProjectileMovementComp->bRotationFollowsVelocity = true;
+	ProjectileMovementComp->bInitialVelocityInLocalSpace = true;
 
 }
 
@@ -35,7 +34,25 @@ ASMagicProjectile::ASMagicProjectile()
 void ASMagicProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+
 	
+	
+}
+
+void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor)
+	{
+		USAttributeComponent* AttributeComponent = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));	
+		if (AttributeComponent)
+		{
+			AttributeComponent->ApplyHealthChange(-20.f);
+
+			Destroy();
+		}
+	}
+		
 }
 
 // Called every frame

@@ -23,6 +23,6 @@ class ACTIONTP_API ISGameplayInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	UFUNCTION(BlueprintNativeEvent) // Difference between BlueprintNativeEvent and BlueprintImplementableEvent is Native is intented to work both on C++ and BP while Implementable expects to work on BP only
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent) // Difference between BlueprintNativeEvent and BlueprintImplementableEvent is Native is intented to work both on C++ and BP while Implementable expects to work on BP only
 	void Interact(APawn* InstigatorPawn); // Specifying instigator lets the function knows who interacted
 };

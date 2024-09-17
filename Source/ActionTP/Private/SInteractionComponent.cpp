@@ -64,10 +64,10 @@ void USInteractionComponent::PrimaryInteract()
 	{
 		if (AActor* HitActor = Hit.GetActor())
 		{
-			if(HitActor->Implements<USGameplayInterface>())
+			if(HitActor->Implements<USGameplayInterface>()) // check if we implemented USGameplay but...
 			{
 				APawn* MyPawn = Cast<APawn>(MyOwner);
-				ISGameplayInterface::Execute_Interact(HitActor, MyPawn);
+				ISGameplayInterface::Execute_Interact(HitActor, MyPawn); // ... call ISGameplay (U vs I)
 				break;
 			}
 		}

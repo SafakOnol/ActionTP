@@ -6,18 +6,19 @@
 #include "SCharacter.h"
 #include "Field/FieldSystemObjects.h"
 #include "PhysicsEngine/RadialForceComponent.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ASExplosiveBarrel::ASExplosiveBarrel()
 {
-	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
-	StaticMeshComponent->SetSimulatePhysics(true);
-	RootComponent = StaticMeshComponent;
+	BaseMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
+	BaseMeshComp->SetSimulatePhysics(true);
+	RootComponent = BaseMeshComp;
 	
 	// TODO: set Radial Vector explosion
 
 	RadialForceComponent = CreateDefaultSubobject<URadialForceComponent>("RadialForce");
-	RadialForceComponent->SetupAttachment(StaticMeshComponent);
+	RadialForceComponent->SetupAttachment(BaseMeshComp);
 
 	RadialForceComponent->SetAutoActivate(false); // When this is true, it applies a constant force via tick
 	RadialForceComponent->Radius = 1000.f;
@@ -39,13 +40,20 @@ void ASExplosiveBarrel::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	// It's the best practice to call add dynamic here instead of on Begin Play, and it must not be called on Constructor!!!
-	StaticMeshComponent->OnComponentHit.AddDynamic(this, &ASExplosiveBarrel::OnActorHit);
+	BaseMeshComp->OnComponentHit.AddDynamic(this, &ASExplosiveBarrel::OnActorHit);
 }
 
 void ASExplosiveBarrel::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
                                    UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	RadialForceComponent->FireImpulse();
+
+	UE_LOG(LogTemp, Log, TEXT("OnActorHit in Explosive Barrel"));
+
+	UE_LOG(LogTemp, Warning, TEXT("Other Actor: %s, at game time %f"), *GetNameSafe(OtherActor), GetWorld()->TimeSeconds);
+
+	FString CombinedString = FString::Printf(TEXT("Hit at location: %s"), *Hit.ImpactPoint.ToString());
+	DrawDebugString(GetWorld(), Hit.ImpactPoint, CombinedString, nullptr, FColor::Magenta, 2.0f, true);
 }
 
 // Called every frame

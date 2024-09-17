@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "SCharacter.generated.h"
 
+class USAttributeComponent;
 class USInteractionComponent;
 class UInputAction;
 class UInputMappingContext;
@@ -50,6 +51,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	USInteractionComponent* InteractionComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USAttributeComponent* AttributeComponent;
 
 	// ENHANCED INPUT SETTINGS
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")

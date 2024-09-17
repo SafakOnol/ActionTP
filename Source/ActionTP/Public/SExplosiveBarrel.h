@@ -23,7 +23,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
-	UStaticMeshComponent* StaticMeshComponent;
+	UStaticMeshComponent* BaseMeshComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	URadialForceComponent* RadialForceComponent;
