@@ -20,29 +20,31 @@ UCLASS()
 class ACTIONTP_API ASCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
+	
 protected:
+	
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<AActor> GravityProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<AActor> WarpProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
 
 	FTimerHandle TimerHandle_PrimaryAttack;
+	FTimerHandle TimerHandle_GravityAttack;
+	FTimerHandle TimerHandle_Warp;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	float AttackDelay = 0.2f;
+	float AttackAnimDelay;
 	
-public:
-	// Sets default values for this character's properties
-	ASCharacter();
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
-	// Safak Onol //
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
 
@@ -72,6 +74,12 @@ protected:
 	UInputAction* PrimaryAttackAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* SecondaryAttackAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* PrimaryAbilityAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* PrimaryInteraction;
 	
 
@@ -81,13 +89,23 @@ protected:
 	void Jump(const FInputActionValue& Value);
 	void PrimaryAttack();
 	void PrimaryAttack_TimeElapsed();
+	void GravityAttack();
+	void GravityAttack_TimeElapsed();
+	void Warp();
+	void Warp_TimeElapsed();
+	void SpawnProjectile(TSubclassOf<AActor>ClassToSpawn);
 	void PrimaryInteract();
 
-public:	
+public:
+	
+	// Sets default values for this character's properties
+	ASCharacter();
+	
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };

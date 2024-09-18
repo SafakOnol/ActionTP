@@ -31,8 +31,9 @@ ASCharacter::ASCharacter()
 	AttributeComponent = CreateDefaultSubobject<USAttributeComponent>("AttributeComponent");
 	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-
 	bUseControllerRotationYaw = false;
+
+	AttackAnimDelay = 0.2f;
 }
 
 // Called when the game starts or when spawned
@@ -92,22 +93,80 @@ void ASCharacter::PrimaryAttack()
 	// Animation
 	PlayAnimMontage(AttackAnim);
 	
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, AttackDelay);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, AttackAnimDelay);
 }
 
 void ASCharacter::PrimaryAttack_TimeElapsed()
 {
-	
-	// Spawn Projectile
-	FVector HandSocketLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	
-	
-	FTransform SpawnTM = FTransform(GetControlRotation(), HandSocketLocation);
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-	
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+	SpawnProjectile(ProjectileClass);
+}
+
+void ASCharacter::GravityAttack()
+{
+	PlayAnimMontage(AttackAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_GravityAttack, this, &ASCharacter::GravityAttack_TimeElapsed, AttackAnimDelay);
+}
+
+void ASCharacter::GravityAttack_TimeElapsed()
+{
+	SpawnProjectile(GravityProjectileClass);
+}
+
+void ASCharacter::Warp()
+{
+	PlayAnimMontage(AttackAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_Warp, this, &ASCharacter::Warp_TimeElapsed, AttackAnimDelay);
+}
+
+void ASCharacter::Warp_TimeElapsed()
+{
+	SpawnProjectile(WarpProjectileClass);
+}
+
+void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
+{
+	if(ensureAlways(ClassToSpawn))
+	{
+		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = this;
+
+		FHitResult Hit;
+		FVector TraceStart = CameraComp->GetComponentLocation();
+		FVector TraceEnd = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
+
+		FCollisionShape Shape;
+		Shape.SetSphere(20.0f);
+
+		// Ignore Player
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+
+		FCollisionObjectQueryParams ObjParams;
+		ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+		ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
+		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
+
+		FRotator ProjectileRotation;
+		// returns true if there's a blocking hit
+		if (GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjParams, Shape, Params))
+		{
+			// if crosshair has a hit on any object, fix projectile rotation accordingly
+			ProjectileRotation = FRotationMatrix::MakeFromX(Hit.ImpactPoint - HandLocation).Rotator();
+		}
+		else
+		{
+			// if there's no hit, fall back to crosshair trace limit
+			ProjectileRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
+		}
+
+		FTransform SpawnTM = FTransform(ProjectileRotation, HandLocation);
+		GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTM, SpawnParams);
+	}
 }
 
 void ASCharacter::PrimaryInteract()
@@ -156,6 +215,8 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &ASCharacter::Turn);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASCharacter::Jump);
 		EnhancedInputComponent->BindAction(PrimaryAttackAction, ETriggerEvent::Triggered, this, &ASCharacter::PrimaryAttack);
+		EnhancedInputComponent->BindAction(SecondaryAttackAction, ETriggerEvent::Triggered, this, &ASCharacter::GravityAttack);
+		EnhancedInputComponent->BindAction(PrimaryAbilityAction, ETriggerEvent::Triggered, this, &ASCharacter::Warp);
 		EnhancedInputComponent->BindAction(PrimaryInteraction, ETriggerEvent::Triggered, this, &ASCharacter::PrimaryInteract);
 	}
 }
