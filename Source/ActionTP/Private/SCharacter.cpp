@@ -104,7 +104,7 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 void ASCharacter::GravityAttack()
 {
 	PlayAnimMontage(AttackAnim);
-
+	
 	GetWorldTimerManager().SetTimer(TimerHandle_GravityAttack, this, &ASCharacter::GravityAttack_TimeElapsed, AttackAnimDelay);
 }
 
