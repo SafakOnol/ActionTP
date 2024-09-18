@@ -23,7 +23,7 @@ void ASTargetDummy::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 	}
 	else
 	{
-		// TODO: add healingh mechanism  
+		// TODO: add healing mechanism  
 	}
 }
 
